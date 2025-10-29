@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Brisa Azul - Carta Digital</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: linear-gradient(to bottom, #8ee7ef, #fef7d1);
+      color: #333;
+    }
+    header {
+      text-align: center;
+      background-color: #00bcd4;
+      color: white;
+      padding: 20px 0;
+      position: relative;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .language-switch {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+    .language-switch button {
+      background-color: white;
+      color: #00bcd4;
+      border: 2px solid #00bcd4;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+      margin-left: 5px;
+      transition: all 0.3s;
+    }
+    .language-switch button:hover {
+      background-color: #00bcd4;
+      color: white;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      background-color: white;
+      padding: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    nav button {
+      background-color: #00bcd4;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    nav button:hover {
+      background-color: #009bb2;
+    }
+    .container {
+      background-color: white;
+      margin: 30px auto;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 1000px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      animation: fadeIn 1s ease-in-out;
+    }
+    h2 {
+      color: #007c91;
+      border-bottom: 2px solid #00bcd4;
+      padding-bottom: 5px;
+    }
+    .dish {
+      margin: 20px 0;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 15px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border-radius: 10px;
+    }
+    .dish:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .dish img {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 10px;
+      background: #f0f0f0;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .editable {
+      border: 1px dashed #ccc;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: #f9f9f9;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>La Brisa Azul</h1>
+    <p id="subtitle">Restaurante costero - Coastal Restaurant</p>
+    <div class="language-switch">
+      <button onclick="setLanguage('es')">ES</button>
+      <button onclick="setLanguage('en')">EN</button>
+    </div>
+  </header>
+
+  <nav>
+    <button onclick="showTab('menu')" id="menuTab">Menú</button>
+    <button onclick="showTab('wines')" id="winesTab">Vinos</button>
+    <button onclick="showTab('history')" id="historyTab">Historia</button>
+    <button onclick="showTab('reservations')" id="reservationsTab">Reservas</button>
+  </nav>
+
+  <div class="container">
+    <div id="menu" class="tab">
+      <h2 id="menuTitle">Carta</h2>
+      <div id="menuContent"></div>
+    </div>
+
+    <div id="wines" class="tab" style="display:none">
+      <h2 id="winesTitle">Carta de Vinos</h2>
+      <ul id="winesList"></ul>
+    </div>
+
+    <div id="history" class="tab" style="display:none">
+      <h2 id="historyTitle">Nuestra Historia</h2>
+      <p id="historyText"></p>
+    </div>
+
+    <div id="reservations" class="tab" style="display:none">
+      <h2 id="reservationsTitle">Reservas</h2>
+      <p id="reservationText"></p>
+    </div>
+  </div>
+
+  <script>
+    const dishes = {
+      starters: [
+        { name_es: 'Tartar de Atún', name_en: 'Tuna Tartare', price: '14€', ingredients_es: 'Atún rojo, aguacate, soja, sésamo', ingredients_en: 'Red tuna, avocado, soy, sesame', allergens_es: 'Pescado, soja, sésamo', allergens_en: 'Fish, soy, sesame' },
+        { name_es: 'Ensalada de Quinoa', name_en: 'Quinoa Salad', price: '11€', ingredients_es: 'Quinoa, tomate, pepino, limón', ingredients_en: 'Quinoa, tomato, cucumber, lemon', allergens_es: 'Ninguno', allergens_en: 'None' },
+        { name_es: 'Gambas al Ajillo', name_en: 'Garlic Shrimp', price: '13€', ingredients_es: 'Gambas, ajo, guindilla, aceite', ingredients_en: 'Shrimp, garlic, chili, olive oil', allergens_es: 'Marisco', allergens_en: 'Shellfish' }
+      ],
+      mains: [
+        { name_es: 'Paella Marinera', name_en: 'Seafood Paella', price: '18€', ingredients_es: 'Arroz, mariscos, azafrán', ingredients_en: 'Rice, seafood, saffron', allergens_es: 'Marisco, moluscos', allergens_en: 'Shellfish, mollusks' },
+        { name_es: 'Lubina a la Plancha', name_en: 'Grilled Seabass', price: '19€', ingredients_es: 'Lubina, limón, aceite de oliva', ingredients_en: 'Seabass, lemon, olive oil', allergens_es: 'Pescado', allergens_en: 'Fish' },
+        { name_es: 'Pollo al Curry', name_en: 'Curry Chicken', price: '16€', ingredients_es: 'Pollo, curry, leche de coco', ingredients_en: 'Chicken, curry, coconut milk', allergens_es: 'Leche', allergens_en: 'Milk' },
+        { name_es: 'Risotto de Setas', name_en: 'Mushroom Risotto', price: '17€', ingredients_es: 'Arroz, setas, parmesano', ingredients_en: 'Rice, mushrooms, parmesan', allergens_es: 'Lácteos', allergens_en: 'Dairy' },
+        { name_es: 'Costillas BBQ', name_en: 'BBQ Ribs', price: '20€', ingredients_es: 'Cerdo, salsa barbacoa', ingredients_en: 'Pork, BBQ sauce', allergens_es: 'Ninguno', allergens_en: 'None' }
+      ],
+      desserts: [
+        { name_es: 'Tarta de Queso', name_en: 'Cheesecake', price: '7€', ingredients_es: 'Queso crema, galleta, arándanos', ingredients_en: 'Cream cheese, biscuit, blueberries', allergens_es: 'Lácteos, gluten', allergens_en: 'Dairy, gluten' },
+        { name_es: 'Helado Artesanal', name_en: 'Homemade Ice Cream', price: '6€', ingredients_es: 'Leche, azúcar, vainilla', ingredients_en: 'Milk, sugar, vanilla', allergens_es: 'Lácteos', allergens_en: 'Dairy' },
+        { name_es: 'Fruta Tropical', name_en: 'Tropical Fruit', price: '6€', ingredients_es: 'Piña, mango, coco', ingredients_en: 'Pineapple, mango, coconut', allergens_es: 'Ninguno', allergens_en: 'None' },
+        { name_es: 'Brownie de Chocolate', name_en: 'Chocolate Brownie', price: '7€', ingredients_es: 'Chocolate, nueces, mantequilla', ingredients_en: 'Chocolate, nuts, butter', allergens_es: 'Frutos secos, lácteos', allergens_en: 'Nuts, dairy' }
+      ]
+    };
+
+    const wines = [
+      { name: 'Albariño Rías Baixas', price: '18€', pairing: 'Pescados y mariscos - Fish & seafood' },
+      { name: 'Rioja Crianza', price: '22€', pairing: 'Carnes y arroces - Meats & rice' },
+      { name: 'Rueda Verdejo', price: '16€', pairing: 'Ensaladas y entrantes - Salads & starters' },
+      { name: 'Cava Brut', price: '20€', pairing: 'Postres y mariscos - Desserts & seafood' }
+    ];
+
+    const history = {
+      es: 'La Brisa Azul nació en 1998 en la costa mediterránea con la idea de fusionar sabores marinos y frescura veraniega. Cada plato refleja la pasión por el mar y la cocina tradicional española reinterpretada con un toque moderno.',
+      en: 'La Brisa Azul was born in 1998 on the Mediterranean coast, aiming to fuse sea flavors with summer freshness. Each dish reflects a passion for the sea and traditional Spanish cuisine with a modern twist.'
+    };
+
+    const reservationText = {
+      es: 'Reserva tu mesa llamando al +34 600 123 456 o escribiendo a reservas@labrisaazul.com',
+      en: 'Book your table by calling +34 600 123 456 or emailing reservas@labrisaazul.com'
+    };
+
+    let currentLang = 'es';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.getElementById('menuTab').innerText = lang === 'es' ? 'Menú' : 'Menu';
+      document.getElementById('winesTab').innerText = lang === 'es' ? 'Vinos' : 'Wines';
+      document.getElementById('historyTab').innerText = lang === 'es' ? 'Historia' : 'History';
+      document.getElementById('reservationsTab').innerText = lang === 'es' ? 'Reservas' : 'Reservations';
+
+      document.getElementById('menuTitle').innerText = lang === 'es' ? 'Carta' : 'Menu';
+      document.getElementById('winesTitle').innerText = lang === 'es' ? 'Carta de Vinos' : 'Wine List';
+      document.getElementById('historyTitle').innerText = lang === 'es' ? 'Nuestra Historia' : 'Our Story';
+      document.getElementById('reservationsTitle').innerText = lang === 'es' ? 'Reservas' : 'Reservations';
+
+      document.getElementById('historyText').innerText = history[lang];
+      document.getElementById('reservationText').innerText = reservationText[lang];
+
+      loadMenu();
+      loadWines();
+    }
+
+    function loadMenu() {
+      const menuDiv = document.getElementById('menuContent');
+      menuDiv.innerHTML = '';
+      const sections = [ ['Entrantes', 'Starters', dishes.starters], ['Platos Principales', 'Main Courses', dishes.mains], ['Postres', 'Desserts', dishes.desserts] ];
+      sections.forEach(([titleEs, titleEn, group]) => {
+        const section = document.createElement('div');
+        section.innerHTML = `<h3>${currentLang === 'es' ? titleEs : titleEn}</h3>`;
+        group.forEach(dish => {
+          const div = document.createElement('div');
+          div.className = 'dish';
+          div.innerHTML = `
+            <div class="editable" contenteditable="true">${currentLang === 'es' ? dish.name_es : dish.name_en}</div>
+            <div><strong>${dish.price}</strong></div>
+            <img src="" alt="${dish.name_en}" placeholder="Espacio para foto del plato / Space for dish photo">
+            <p>${currentLang === 'es' ? dish.ingredients_es : dish.ingredients_en}</p>
+            <p><em>${currentLang === 'es' ? 'Alérgenos' : 'Allergens'}: ${currentLang === 'es' ? dish.allergens_es : dish.allergens_en}</em></p>
+          `;
+          menuDiv.appendChild(div);
+        });
+        menuDiv.appendChild(section);
+      });
+    }
+
+    function loadWines() {
+      const list = document.getElementById('winesList');
+      list.innerHTML = '';
+      wines.forEach(w => {
+        const li = document.createElement('li');
+        li.textContent = `${w.name} - ${w.price} - ${w.pairing}`;
+        list.appendChild(li);
+      });
+    }
+
+    function showTab(id) {
+      document.querySelectorAll('.tab').forEach(tab => tab.style.display = 'none');
+      document.getElementById(id).style.display = 'block';
+    }
+
+    setLanguage('es');
+  </script>
+</body>
+</html>
